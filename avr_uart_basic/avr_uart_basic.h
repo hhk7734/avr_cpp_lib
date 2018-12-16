@@ -27,6 +27,12 @@ public:
     
     inline void transmit(const char data) {transmit(static_cast<uint8_t>(data));}
     void transmit(const char data[]);
+    void transmit(uint16_t data);
+    inline void transmit(int16_t data) {if(data < 0){transmit('-');data = -data;}transmit(static_cast<uint16_t>(data));}
+    void transmit(uint32_t data);
+    inline void transmit(int32_t data) {if(data < 0){transmit('-');data = -data;}transmit(static_cast<uint32_t>(data));}
+    void transmit(uint64_t data);
+    inline void transmit(int64_t data) {if(data < 0){transmit('-');data = -data;}transmit(static_cast<uint64_t>(data));}
 
 protected:
     volatile uint8_t &ucsra;
