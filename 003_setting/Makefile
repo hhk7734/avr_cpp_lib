@@ -28,6 +28,7 @@ rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 
 C_SRCS  = $(call rwildcard,,*.c)
 CXX_SRCS = $(call rwildcard,,*.cpp)
+HEADER = $(call rwildcard,,*.h)
 
 OBJDIR = obj
 
@@ -35,8 +36,7 @@ C_OBJS  = $(addprefix $(OBJDIR)/,$(notdir $(patsubst %.c,%.o,$(C_SRCS))))
 CXX_OBJS = $(addprefix $(OBJDIR)/,$(notdir $(patsubst %.cpp,%.o,$(CXX_SRCS))))
 
 # 경로 추가
-CFLAGS += $(addprefix -I,$(dir $(C_SRCS)))
-CFLAGS += $(addprefix -I,$(dir $(CXX_SRCS)))
+CFLAGS += $(addprefix -I,$(dir $(HEADER)))
 
 BUILD = $(TARGET)
 
