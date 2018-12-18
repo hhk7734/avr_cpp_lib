@@ -11,29 +11,31 @@
 
 #include "avr_uart_basic.h"
 
-#define LOT_UART_TX_BUF_SIZE 64
-#define LOT_UART_RX_BUF_SIZE 64
+/// 버퍼 크기는 32, 64, 128 ... 2의 지수로 설정
+#define LOT_UART0_TX_BUF_SIZE 64
+#define LOT_UART0_RX_BUF_SIZE 64
 
-class LOT_uart0 : public LOT_uart_basic
-{
+class LOT_uart0 : public LOT_uart_basic {
 public:
-    LOT_uart0() : LOT_uart_basic(UCSR0A,UCSR0B,UCSR0C,UBRR0H,UBRR0L,UDR0) {}
-    
-    virtual void rx_isr(void);
-    virtual void udre_isr(void);
+    LOT_uart0()
+        : LOT_uart_basic( UCSR0A, UCSR0B, UCSR0C, UBRR0L, UBRR0H, UDR0 )
+    {
+    }
 
-    virtual void setup(const uint32_t baud_rate);
-    virtual uint8_t receive(uint8_t &one_byte);
-    virtual void transmit(const uint8_t data);
+    void    rx_isr( void );
+    void    udre_isr( void );
+    void    setup( const uint32_t baud_rate );
+    uint8_t receive( uint8_t *data, uint8_t max_size );
+    void    transmit( const uint8_t data );
 
-    using LOT_uart_basic::receive;
     using LOT_uart_basic::transmit;
 
-private:
-    volatile uint8_t tx_buf[LOT_UART_TX_BUF_SIZE];
-    volatile uint8_t rx_buf[LOT_UART_RX_BUF_SIZE];
+protected:
+    volatile uint8_t tx_buf[LOT_UART0_TX_BUF_SIZE];
+    volatile uint8_t rx_buf[LOT_UART0_RX_BUF_SIZE];
 };
 
+/// 객체 생성
 extern LOT_uart0 uart0;
 
-#endif // _AVR_UART0_H_
+#endif    // _AVR_UART0_H_
