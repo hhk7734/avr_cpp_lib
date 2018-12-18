@@ -67,7 +67,7 @@ public:
     }
 
     /**
-     * @brief 원하는 데이터 송신 후 \n\r 송신
+     * @brief 원하는 데이터 송신 후 "\n\r" 송신
      * @param T data 송신할 데이터
      */
     template<typename T>
