@@ -4,8 +4,8 @@
  * @brief UART 통신 구축
  */
 
-#ifndef _AVR_UART_BASIC_
-#define _AVR_UART_BASIC_
+#ifndef _AVR_UART_BASIC_H_
+#define _AVR_UART_BASIC_H_
 
 #include <inttypes.h>
 
@@ -103,4 +103,4 @@ protected:
     volatile uint8_t rx_buf_tail;
 };
 
-#endif    // _AVR_UART_BASIC_
+#endif    // _AVR_UART_BASIC_H_

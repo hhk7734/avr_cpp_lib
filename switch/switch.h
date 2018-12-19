@@ -4,6 +4,9 @@
  * @brief 스위치
  */
 
+#ifndef _SWITCH_H_
+#define _SWITCH_H_
+
 #include <inttypes.h>
 
 class LOT_switch {
@@ -37,3 +40,5 @@ private:
     volatile uint8_t &port;
     const uint8_t     pin_num;
 };
+
+#endif    // _SWITCH_H_
