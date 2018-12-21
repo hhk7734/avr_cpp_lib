@@ -1,7 +1,7 @@
 /**
  * @file LOT_transmit.h
  * @author Hyeon-ki, Hong (hhk7734@gmail.com)
- * @brief 8bit 데이터를 기본으로 하는 문자열 송신
+ * @brief 문자열 송신
  */
 
 #ifndef _LOT_TRANSMIT_H_

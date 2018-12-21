@@ -1,7 +1,7 @@
 /**
  * @file LOT_transmit.cpp
  * @author Hyeon-ki, Hong (hhk7734@gmail.com)
- * @brief 8bit 데이터를 기본으로 하는 문자열 전송
+ * @brief 문자열 전송
  */
 
 #include "LOT_transmit.h"
