@@ -2,12 +2,12 @@ TARGET = main
 MCU_TARGET =
 MCU_F_CPU  =
 
-PROGRAMMER = arduino
-# PORT = /dev/cu.usbserial-DN042E96
-PORT = /dev/cu.wchusbserial146340
+PROGRAMMER = 
+PORT = /dev/cu.
 BITCLOCK = 0.5 # ms 단위
 BAUDRATE = 115200
 UPLOAD = avrdude -p$(MCU_TARGET) -c$@ -v -Uflash:w:$(TARGET).elf:e
+UPLOAD += -D
 
 CC = avr-gcc
 C_FLAGS = -fpack-struct
@@ -37,6 +37,8 @@ CXX_OBJS = $(addprefix $(OBJDIR)/,$(notdir $(patsubst %.cpp,%.o,$(CXX_SRCS))))
 
 # 경로 추가
 CFLAGS += $(addprefix -I,$(dir $(HEADER)))
+CFLAGS += $(addprefix -I,$(dir $(C_SRCS)))
+CFLAGS += $(addprefix -I,$(dir $(CXX_SRCS)))
 
 BUILD = $(TARGET)
 
@@ -54,7 +56,10 @@ clean: ;rm -rf $(TARGET).* $(OBJDIR)
 upload: $(PROGRAMMER)
 stk500: ;$(UPLOAD) -P$(PORT)
 avrispmkII: ;$(UPLOAD) -B$(BITCLOCK)
+# arduino uno, nano, promini
 arduino: ;$(UPLOAD) -P$(PORT) -b$(BAUDRATE)
+# arduino mega
+wiring: ;$(UPLOAD) -P$(PORT) -b$(BAUDRATE)
 atmelice_isp: ;$(UPLOAD)
 
 # 링크
