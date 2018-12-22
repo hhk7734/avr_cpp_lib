@@ -70,9 +70,14 @@ void LOT_uart0::udre_isr( void )
 
 void LOT_uart0::setup( const uint32_t baud_rate,
                        const uint8_t  data_bits,
-                       const uint8_t  stop_bit,
+                       const uint8_t  stop_bits,
                        const uint8_t  parity )
 {
+    /// @todo data bits, stop_bits, parity
+    /// @todo u2x 모드 사용 아두이노는 기본으로 u2x 사용하고 문제가 있는경우만 non u2x
+    /// @todo ubrr 0~4095까지 가능
+    /// @todo 57600 모드
+
     ucsra = 0;
     ucsrb = rxcie | rxen | txen;
     ucsrc = ucsz1 | ucsz0;
