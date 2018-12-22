@@ -47,10 +47,10 @@ const uint8_t ucsz0 { _BV( UCSZ00 ) };
 const uint8_t ucpol { _BV( UCPOL0 ) };
 
 LOT_uart0::LOT_uart0()
-    : tx_buf_head( 0 )
-    , tx_buf_tail( 0 )
-    , rx_buf_head( 0 )
+    : rx_buf_head( 0 )
     , rx_buf_tail( 0 )
+    , tx_buf_head( 0 )
+    , tx_buf_tail( 0 )
 {
 }
 
