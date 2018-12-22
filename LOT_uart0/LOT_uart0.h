@@ -1,7 +1,7 @@
 /**
  * @file LOT_uart0.h
  * @author Hyeon-ki, Hong (hhk7734@gmail.com)
- * @brief
+ * @brief UART0 통신
  */
 
 #ifndef _LOT_UART0_H_
@@ -49,13 +49,13 @@ public:
     virtual uint8_t  receive_basic( void );
 
 protected:
-    volatile uint8_t tx_buf_head;
-    volatile uint8_t tx_buf_tail;
     volatile uint8_t rx_buf_head;
     volatile uint8_t rx_buf_tail;
+    volatile uint8_t tx_buf_head;
+    volatile uint8_t tx_buf_tail;
 
-    volatile uint8_t tx_buf[LOT_UART0_TX_BUF_SIZE];
     volatile uint8_t rx_buf[LOT_UART0_RX_BUF_SIZE];
+    volatile uint8_t tx_buf[LOT_UART0_TX_BUF_SIZE];
 
 private:
 };
