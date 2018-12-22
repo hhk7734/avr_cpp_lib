@@ -12,7 +12,8 @@
 #include "LOT_transmit.h"
 #include "LOT_receive.h"
 
-#if !defined( __AVR_ATmega328P__ ) && !defined( __AVR_ATmega128__ )
+#if !defined( __AVR_ATmega328P__ ) && !defined( __AVR_ATmega128__ ) \
+    && !defined( __AVR_ATmega2560__ )
 #    warning "Untested device"
 #endif
 

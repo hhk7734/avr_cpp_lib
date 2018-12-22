@@ -129,6 +129,20 @@ uint8_t LOT_uart0::receive_basic( void )
 
 LOT_uart0 uart0;
 
-ISR( USART_RX_vect ) { uart0.rx_isr(); }
+#if defined( USART_RX_vect )
+ISR( USART_RX_vect )
+#elif defined( USART0_RX_vect )
+ISR( USART0_RX_vect )
+#endif
+{
+    uart0.rx_isr();
+}
 
-ISR( USART_UDRE_vect ) { uart0.udre_isr(); }
+#if defined( USART_UDRE_vect )
+ISR( USART_UDRE_vect )
+#elif defined( USART0_UDRE_vect )
+ISR( USART0_UDRE_vect )
+#endif
+{
+    uart0.udre_isr();
+}
