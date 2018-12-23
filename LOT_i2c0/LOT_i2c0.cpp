@@ -1,7 +1,7 @@
 /**
  * @file LOT_i2c0.cpp
  * @author Hyeon-ki, Hong (hhk7734@gmail.com)
- * @brief i2c 마스터 통신
+ * @brief I2C 마스터 통신
  */
 
 #include "LOT_i2c0.h"
