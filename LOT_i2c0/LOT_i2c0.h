@@ -1,7 +1,7 @@
 /**
  * @file LOT_i2c0.h
  * @author Hyeon-ki, Hong (hhk7734@gmail.com)
- * @brief
+ * @brief i2c 마스터 통신
  */
 
 #ifndef _LOT_I2C0_H_
