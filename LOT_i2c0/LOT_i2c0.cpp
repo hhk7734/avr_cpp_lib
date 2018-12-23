@@ -36,7 +36,46 @@ const uint8_t LOT_TWEN { _BV( TWEN ) };
 /// interrupt enable
 const uint8_t LOT_TWIE { _BV( TWIE ) };
 
-LOT_i2c0::LOT_i2c0() {}
+LOT_i2c0::LOT_i2c0()
+    : error_state( 0xFF )
+{
+}
+
+inline LOT_status_typedef LOT_i2c0::SLA_W( const uint8_t slave_address )
+{
+    control( LOT_TWINT | LOT_TWSTA | LOT_TWEN );
+    twdr = slave_address << 1;
+    return control( LOT_TWINT | LOT_TWEA | LOT_TWEN );
+}
+
+inline LOT_status_typedef LOT_i2c0::SLA_R( const uint8_t slave_address )
+{
+    control( LOT_TWINT | LOT_TWSTA | LOT_TWEN );
+    twdr = ( slave_address << 1 ) | 0x01;
+    return control( LOT_TWINT | LOT_TWEA | LOT_TWEN );
+}
+
+inline LOT_status_typedef LOT_i2c0::transmit_data( const uint8_t data )
+{
+    twdr = data;
+    return control( LOT_TWINT | LOT_TWEA | LOT_TWEN );
+}
+inline uint8_t LOT_i2c0::receive_data( void )
+{
+    control( LOT_TWINT | LOT_TWEA | LOT_TWEN );
+    return twdr;
+}
+inline uint8_t LOT_i2c0::receive_last_data( void )
+{
+    control( LOT_TWINT | LOT_TWEN );
+    return twdr;
+}
+
+inline void LOT_i2c0::stop( void )
+{
+    twcr = LOT_TWINT | LOT_TWSTO | LOT_TWEN;
+    // while( (twcr & LOT_TWSTO) !=0 ) {}
+}
 
 void LOT_i2c0::setup( const uint32_t scl_clock )
 {
@@ -47,32 +86,76 @@ void LOT_i2c0::setup( const uint32_t scl_clock )
 LOT_status_typedef
     LOT_i2c0::transmit( const uint8_t slave_address, const uint8_t *data, uint8_t size )
 {
-    /// START
-    control( LOT_TWINT | LOT_TWSTA | LOT_TWEN );
-    twdr = slave_address << 1;
-    /// ACK or transmit
-    if( control( LOT_TWINT | LOT_TWEA | LOT_TWEN ) == LOT_OK )
+    if( SLA_W( slave_address ) == LOT_OK )
     {
-        for( uint8_t i = 0; i < size; ++i )
-        {
-            twdr = data[i];
-            control( LOT_TWINT | LOT_TWEA | LOT_TWEN );
-        }
+        for( uint8_t i = 0; i < size; ++i ) { transmit_data( data[i] ); }
+        stop();
+        return LOT_OK;
     }
     else
     {
         error();
+        return LOT_ERROR;
     }
 }
 
 LOT_status_typedef LOT_i2c0::transmit( const uint8_t slave_address,
                                        const uint8_t register_address,
-                                       uint8_t *     data,
+                                       const uint8_t *     data,
                                        uint8_t       size )
 {
+    if( SLA_W( slave_address ) == LOT_OK )
+    {
+        transmit_data( register_address );
+        for( uint8_t i = 0; i < size; ++i ) { transmit_data( data[i] ); }
+        stop();
+        return LOT_OK;
+    }
+    else
+    {
+        error();
+        return LOT_ERROR;
+    }
 }
 
-LOT_status_typedef LOT_i2c0::control( const uint8_t &_twcr ) __attribute__( ( noinline ) )
+LOT_status_typedef LOT_i2c0::receive( const uint8_t slave_address, uint8_t *data, uint8_t size )
+{
+    if( SLA_R( slave_address ) == LOT_OK )
+    {
+        for( uint8_t i = 0; i < size - 1; ++i ) { data[i] = receive_data(); }
+        data[size - 1] = receive_last_data();
+        stop();
+        return LOT_OK;
+    }
+    else
+    {
+        error();
+        return LOT_ERROR;
+    }
+}
+
+LOT_status_typedef LOT_i2c0::receive( const uint8_t slave_address,
+                                      const uint8_t register_address,
+                                      uint8_t *     data,
+                                      uint8_t       size )
+{
+    if(SLA_W(slave_address)==LOT_OK)
+    {
+        transmit_data( register_address );
+        SLA_R( slave_address );
+        for( uint8_t i = 0; i < size - 1; ++i ) { data[i] = receive_data(); }
+        data[size - 1] = receive_last_data();
+        stop();
+        return LOT_OK;
+    }
+    else
+    {
+        error();
+        return LOT_ERROR;
+    }
+}
+
+LOT_status_typedef __attribute__( ( noinline ) ) LOT_i2c0::control( const uint8_t _twcr )
 {
     twcr = _twcr;
 #if LOT_I2C0_TIME_OUT <= 0xFF
@@ -95,12 +178,10 @@ LOT_status_typedef LOT_i2c0::control( const uint8_t &_twcr ) __attribute__( ( no
 
 void LOT_i2c0::error( void )
 {
-    for( ;; ) {}
+    if( error_state != 0xFF )
+    {
+        for( ;; ) {}
+    }
 }
 
-inline void nack( void ) { twcr = twint | twen; }
-inline void stop( void )
-{
-    twcr = twint | twsto | twen;
-    // while( ( twcr & twsto ) != 0 ) {}
-}
+LOT_i2c0 i2c0;
