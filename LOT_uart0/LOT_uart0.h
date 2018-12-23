@@ -42,7 +42,7 @@ public:
      * @param uint32_t baud_rate
      * @param uint8_t data_bits 5, 6, 7, 8 or 9 bits
      * @param uint8_t stop_bits 1 or 2 bits
-     * @param uint8_t parity 0-none, 1- even, 2-odd
+     * @param uint8_t parity 0-none, 1-odd, 2-even
      */
     void        setup( const uint32_t baud_rate,
                        const uint8_t  data_bits,
