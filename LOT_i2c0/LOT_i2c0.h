@@ -127,6 +127,7 @@ public:
 protected:
 private:
     uint8_t error_state;
+    uint8_t error_count;
 
     /**
      * @brief I2C 통신을 통해 데이터를 전송\n

@@ -38,6 +38,7 @@ const uint8_t LOT_TWIE { _BV( TWIE ) };
 
 LOT_i2c0::LOT_i2c0()
     : error_state( 0xFF )
+    , error_count( 0 )
 {
 }
 
@@ -99,10 +100,10 @@ LOT_status_typedef
     }
 }
 
-LOT_status_typedef LOT_i2c0::transmit( const uint8_t slave_address,
-                                       const uint8_t register_address,
-                                       const uint8_t *     data,
-                                       uint8_t       size )
+LOT_status_typedef LOT_i2c0::transmit( const uint8_t  slave_address,
+                                       const uint8_t  register_address,
+                                       const uint8_t *data,
+                                       uint8_t        size )
 {
     if( SLA_W( slave_address ) == LOT_OK )
     {
@@ -139,7 +140,7 @@ LOT_status_typedef LOT_i2c0::receive( const uint8_t slave_address,
                                       uint8_t *     data,
                                       uint8_t       size )
 {
-    if(SLA_W(slave_address)==LOT_OK)
+    if( SLA_W( slave_address ) == LOT_OK )
     {
         transmit_data( register_address );
         SLA_R( slave_address );
@@ -178,7 +179,19 @@ LOT_status_typedef __attribute__( ( noinline ) ) LOT_i2c0::control( const uint8_
 
 void LOT_i2c0::error( void )
 {
-    if( error_state != 0xFF )
+    switch( error_state )
+    {
+        case 0xFF: break;
+        case TW_MT_ARB_LOST: control( LOT_TWINT | LOT_TWEA | LOT_TWEN ); break;
+        case TW_MT_SLA_NACK:
+        case TW_MT_DATA_NACK:
+        case TW_MR_SLA_NACK:
+        case TW_BUS_ERROR: stop(); break;
+        default: break;
+    }
+    error_state = 0xFF;
+    ++error_count;
+    if( error_count > 10 )
     {
         for( ;; ) {}
     }
