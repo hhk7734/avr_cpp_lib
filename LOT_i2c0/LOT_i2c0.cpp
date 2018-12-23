@@ -144,38 +144,45 @@ void LOT_i2c0::setup( const uint32_t scl_clock )
     sei();
 }
 
-uint8_t LOT_i2c0::transmit( const uint8_t slave_address, const uint8_t *data, uint8_t size )
+LOT_status_typedef
+    LOT_i2c0::transmit( const uint8_t slave_address, const uint8_t *data, uint8_t size )
 {
-    while( state != I2C_READY ) {}
+    check( I2C_WRITE );
+
     _slave_address_rw = slave_address << 1;
-    if( size > LOT_I2C0_BUF_SIZE ) { buf_length = LOT_I2C0_BUF_SIZE; }
+
+    if( size > LOT_I2C0_BUF_SIZE ) { return LOT_ERROR; }
     else
     {
         buf_length = size;
     }
-    buf_index = 0;
+
     for( uint8_t i = 0; i < buf_length; ++i ) { buf[i] = data[i]; }
+
     start();
-    return buf_length;
+    return LOT_OK;
 }
 
-uint8_t LOT_i2c0::transmit( const uint8_t slave_address,
-                            const uint8_t register_address,
-                            uint8_t *     data,
-                            uint8_t       size )
+LOT_status_typedef LOT_i2c0::transmit( const uint8_t slave_address,
+                                       const uint8_t register_address,
+                                       uint8_t *     data,
+                                       uint8_t       size )
 {
-    while( state != I2C_READY ) {}
+    check( I2C_WRITE );
+
     _slave_address_rw = slave_address << 1;
-    if( size > LOT_I2C0_BUF_SIZE - 1 ) { buf_length = LOT_I2C0_BUF_SIZE - 1; }
+
+    if( size > LOT_I2C0_BUF_SIZE - 1 ) { return LOT_ERROR; }
     else
     {
         buf_length = size;
     }
-    buf_index = 0;
-    buf[0]    = register_address;
+
+    buf[0] = register_address;
     for( uint8_t i = 1; i < buf_length + 1; ++i ) { buf[i] = data[i]; }
+
     start();
-    return buf_length;
+    return LOT_OK;
 }
 
 void LOT_i2c0::transmit( const uint8_t slave_address, const uint8_t register_address, uint8_t data )
@@ -185,14 +192,40 @@ void LOT_i2c0::transmit( const uint8_t slave_address, const uint8_t register_add
 
 uint8_t LOT_i2c0::receive( const uint8_t slave_address, uint8_t *data, uint8_t max_size )
 {
-    while( state != I2C_READY ) {}
+    check( I2C_READ );
+
+    _slave_address_rw = ( slave_address << 1 ) | 0x01;
+
+    if( max_size > LOT_I2C0_BUF_SIZE ) { max_size = LOT_I2C0_BUF_SIZE; }
+
+    buf_length = max_size;
+
+    start();
+    return buf_length;
 }
+
 uint8_t LOT_i2c0::receive( const uint8_t slave_address,
                            const uint8_t register_address,
                            uint8_t *     data,
                            uint8_t       max_size )
 {
+    check( I2C_WRITE_READ );
+
+    _slave_address_rw = slave_address << 1;
+
+    if( max_size > LOT_I2C0_BUF_SIZE ) { max_size = LOT_I2C0_BUF_SIZE; }
+
+    buf[0]     = register_address;
+    buf[1]     = max_size;
+    buf_length = 1;
+
+    start();
+
+    /// @todo data 반환이 비효율적
+
+    return max_size;
 }
+
 uint8_t LOT_i2c0::receive( const uint8_t slave_address, const uint8_t register_address ) {}
 
 void LOT_i2c0::transmit_slow( const uint8_t slave_address, const uint8_t *data, uint8_t size ) {}
@@ -221,6 +254,13 @@ void LOT_i2c0::stop( void )
     twcr = twint | twsto | twen;
     // while( ( twcr & twsto ) != 0 ) {}
     state = I2C_READY;
+}
+
+void LOT_i2c0::check( uint8_t _state )
+{
+    while( state != I2C_READY ) {}
+    state     = _state;
+    buf_index = 0;
 }
 
 LOT_i2c0 i2c0;

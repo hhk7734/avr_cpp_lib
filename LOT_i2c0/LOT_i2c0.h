@@ -40,8 +40,8 @@ public:
     void        setup( const uint32_t scl_clock );
     inline void setup( void ) { setup( LOT_I2C0_DEFAULT_CLOCK ); }
 
-    uint8_t transmit( const uint8_t slave_address, const uint8_t *data, uint8_t size );
-    uint8_t transmit( const uint8_t slave_address,
+    LOT_status_typedef transmit( const uint8_t slave_address, const uint8_t *data, uint8_t size );
+    LOT_status_typedef transmit( const uint8_t slave_address,
                       const uint8_t register_address,
                       uint8_t *     data,
                       uint8_t       size );
@@ -77,6 +77,7 @@ private:
     void ack( void );
     void nack( void );
     void stop( void );
+    void check( uint8_t _state );
 };
 
 extern LOT_i2c0 i2c0;
