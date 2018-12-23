@@ -1,7 +1,7 @@
 /**
  * @file LOT_transmit.cpp
  * @author Hyeon-ki, Hong (hhk7734@gmail.com)
- * @brief 문자열 전송
+ * @brief 문자열 송신
  */
 
 #include "LOT_transmit.h"
