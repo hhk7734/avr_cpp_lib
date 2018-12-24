@@ -74,13 +74,15 @@ void LOT_uart0::setup( const uint32_t baud_rate,
                        const uint8_t  stop_bits,
                        const uint8_t  parity )
 {
-    /// @todo 9bit 지원
-    /// @todo u2x 문제 있나 확인
-
-    ucsra         = LOT_U2X;
-    uint16_t temp = ( F_CPU / baud_rate / 8 ) - 1;
+    /// @todo u2x 문제 생기면 해결
+    ucsra = LOT_U2X;
+    /// ( F_CPU / baud_rate / 8 ) - 1 을 계산한 뒤 소수점 첫째 자리에서 반올림 해야하지만
+    /// 부동소수 -> 정수로 갈때 버림을 하기 때문에 0.5를 더한다
+    uint16_t temp = ( ( F_CPU / baud_rate / 4 ) - 1 ) / 2;
 
     ucsrb = LOT_RXCIE | LOT_RXEN | LOT_TXEN;
+
+    /// @todo 9bit 지원
     if( data_bits < 9 ) { ucsrc = ( data_bits - 5 ) << 1; }
     else
     {
