@@ -17,34 +17,34 @@ volatile uint8_t &ubrrh { UBRR0H };
 volatile uint8_t &udr { UDR0 };
 
 /// UCSRA
-const uint8_t rxc { _BV( RXC0 ) };
-const uint8_t txc { _BV( TXC0 ) };
-const uint8_t udre { _BV( UDRE0 ) };
-const uint8_t fe { _BV( FE0 ) };
-const uint8_t dor { _BV( DOR0 ) };
-const uint8_t upe { _BV( UPE0 ) };
-const uint8_t u2x { _BV( U2X0 ) };
-const uint8_t mpcm { _BV( MPCM0 ) };
+const uint8_t LOT_RXC { _BV( RXC0 ) };
+const uint8_t LOT_TXC { _BV( TXC0 ) };
+const uint8_t LOT_UDRE { _BV( UDRE0 ) };
+const uint8_t LOT_FE { _BV( FE0 ) };
+const uint8_t LOT_DOR { _BV( DOR0 ) };
+const uint8_t LOT_UPE { _BV( UPE0 ) };
+const uint8_t LOT_U2X { _BV( U2X0 ) };
+const uint8_t LOT_MPCM { _BV( MPCM0 ) };
 
 /// UCSRB
-const uint8_t rxcie { _BV( RXCIE0 ) };
-const uint8_t txcie { _BV( TXCIE0 ) };
-const uint8_t udrie { _BV( UDRIE0 ) };
-const uint8_t rxen { _BV( RXEN0 ) };
-const uint8_t txen { _BV( TXEN0 ) };
-const uint8_t ucsz2 { _BV( UCSZ02 ) };
-const uint8_t rxb8 { _BV( RXB80 ) };
-const uint8_t txb8 { _BV( TXB80 ) };
+const uint8_t LOT_RXCIE { _BV( RXCIE0 ) };
+const uint8_t LOT_TXCIE { _BV( TXCIE0 ) };
+const uint8_t LOT_UDRIE { _BV( UDRIE0 ) };
+const uint8_t LOT_RXEN { _BV( RXEN0 ) };
+const uint8_t LOT_TXEN { _BV( TXEN0 ) };
+const uint8_t LOT_UCSZ2 { _BV( UCSZ02 ) };
+const uint8_t LOT_RXB8 { _BV( RXB80 ) };
+const uint8_t LOT_TXB8 { _BV( TXB80 ) };
 
 /// UCSRC
-const uint8_t umsel1 { _BV( UMSEL01 ) };
-const uint8_t umsel0 { _BV( UMSEL00 ) };
-const uint8_t upm1 { _BV( UPM01 ) };
-const uint8_t upm0 { _BV( UPM00 ) };
-const uint8_t usbs { _BV( USBS0 ) };
-const uint8_t ucsz1 { _BV( UCSZ01 ) };
-const uint8_t ucsz0 { _BV( UCSZ00 ) };
-const uint8_t ucpol { _BV( UCPOL0 ) };
+const uint8_t LOT_UMSEL1 { _BV( UMSEL01 ) };
+const uint8_t LOT_UMSEL0 { _BV( UMSEL00 ) };
+const uint8_t LOT_UPM1 { _BV( UPM01 ) };
+const uint8_t LOT_UPM0 { _BV( UPM00 ) };
+const uint8_t LOT_USBS { _BV( USBS0 ) };
+const uint8_t LOT_UCSZ1 { _BV( UCSZ01 ) };
+const uint8_t LOT_UCSZ0 { _BV( UCSZ00 ) };
+const uint8_t LOT_UCPOL { _BV( UCPOL0 ) };
 
 LOT_uart0::LOT_uart0()
     : rx_buf_head( 0 )
@@ -60,12 +60,13 @@ void LOT_uart0::rx_isr( void )
     rx_buf_head         = ( rx_buf_head + 1 ) % LOT_UART0_TX_BUF_SIZE;
     if( rx_buf_head == rx_buf_tail ) { rx_buf_tail = ( rx_buf_tail + 1 ) % LOT_UART0_RX_BUF_SIZE; }
 }
+
 void LOT_uart0::udre_isr( void )
 {
     udr         = tx_buf[tx_buf_tail];
     tx_buf_tail = ( tx_buf_tail + 1 ) % LOT_UART0_TX_BUF_SIZE;
-    ucsra |= txc;
-    if( tx_buf_head == tx_buf_tail ) { ucsrb &= ~udrie; }
+    ucsra |= LOT_TXC;
+    if( tx_buf_head == tx_buf_tail ) { ucsrb &= ~LOT_UDRIE; }
 }
 
 void LOT_uart0::setup( const uint32_t baud_rate,
@@ -73,34 +74,47 @@ void LOT_uart0::setup( const uint32_t baud_rate,
                        const uint8_t  stop_bits,
                        const uint8_t  parity )
 {
-    /// @todo data bits, stop_bits, parity
-    /// @todo u2x 모드 사용 아두이노는 기본으로 u2x 사용하고 문제가 있는경우만 non u2x
-    /// @todo ubrr 0~4095까지 가능
-    /// @todo 57600 모드
+    /// @todo 9bit 지원
+    /// @todo u2x 문제 있나 확인
 
-    ucsra = 0;
-    ucsrb = rxcie | rxen | txen;
-    ucsrc = ucsz1 | ucsz0;
+    ucsra         = LOT_U2X;
+    uint16_t temp = ( F_CPU / baud_rate / 8 ) - 1;
 
-    uint16_t temp = ( F_CPU / baud_rate / 16 ) - 1;
-    ubrrh         = temp >> 8;
-    ubrrl         = temp;
+    ucsrb = LOT_RXCIE | LOT_RXEN | LOT_TXEN;
+    if( data_bits < 9 ) { ucsrc = ( data_bits - 5 ) << 1; }
+    else
+    {
+        ucsrc = ( 8 - 5 ) << 1;
+    }
+
+    switch( parity )
+    {
+        /// odd parity
+        case 1: ucsrc |= LOT_UPM0;
+        /// even parity
+        case 2: ucsrc |= LOT_UPM1; break;
+    }
+
+    if( stop_bits == 2 ) { ucsrc |= LOT_USBS; }
+
+    ubrrh = temp >> 8;
+    ubrrl = temp;
 
     sei();
 }
 
 void LOT_uart0::transmit_basic( uint8_t data )
 {
-    if( ( tx_buf_head == tx_buf_tail ) && ( ucsra & udre ) )
+    if( ( tx_buf_head == tx_buf_tail ) && ( ucsra & LOT_UDRE ) )
     {
         udr = data;
-        ucsra |= txc;
+        ucsra |= LOT_TXC;
         return;
     }
     tx_buf[tx_buf_head] = data;
     tx_buf_head         = ( tx_buf_head + 1 ) % LOT_UART0_TX_BUF_SIZE;
     while( tx_buf_head == tx_buf_tail ) {}
-    ucsrb |= udrie;
+    ucsrb |= LOT_UDRIE;
 }
 
 uint16_t LOT_uart0::receive_basic( uint8_t *data, uint16_t max_size )
