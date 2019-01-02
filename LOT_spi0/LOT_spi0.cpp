@@ -6,29 +6,11 @@
 
 #include "LOT_spi0.h"
 
-#include <avr/io.h>
-
-volatile uint8_t &spcr { SPCR };
-volatile uint8_t &spsr { SPSR };
-volatile uint8_t &spdr { SPDR };
-
-/// SPCR
-const uint8_t LOT_SPIE { _BV( SPIE ) };
-const uint8_t LOT_SPE { _BV( SPE ) };
-const uint8_t LOT_DORD { _BV( DORD ) };
-const uint8_t LOT_MSTR { _BV( MSTR ) };
-const uint8_t LOT_CPOL { _BV( CPOL ) };
-const uint8_t LOT_CPHA { _BV( CPHA ) };
-const uint8_t LOT_SPR1 { _BV( SPR1 ) };
-const uint8_t LOT_SPR0 { _BV( SPR0 ) };
-
-/// SPSR
-const uint8_t LOT_SPIF { _BV( SPIF ) };
-const uint8_t LOT_WCOL { _BV( WCOL ) };
-const uint8_t LOT_SPI2X { _BV( SPI2X ) };
-
-LOT_spi0::LOT_spi0()
+LOT_spi0::LOT_spi0( volatile uint8_t &_spcr, volatile uint8_t &_spsr, volatile uint8_t &_spdr )
     : error_count( 0 )
+    , spcr( _spcr )
+    , spsr( _spsr )
+    , spdr( _spdr )
 {
 }
 
@@ -83,28 +65,6 @@ LOT_status_typedef
         error();
         return LOT_ERROR;
     }
-}
-
-inline LOT_status_typedef LOT_spi0::transmit( const uint8_t data )
-{
-    spdr = data;
-#if LOT_SPI0_TIME_OUT <= 0xFF
-    uint8_t count = LOT_SPI0_TIME_OUT;
-#else
-    uint16_t count = LOT_SPI0_TIME_OUT;
-#endif
-    while( ( spsr & LOT_SPIF ) == 0 )
-    {
-        --count;
-        if( count == 0 ) { return LOT_ERROR; }
-    }
-    return LOT_OK;
-}
-
-inline uint8_t LOT_spi0::transceive( const uint8_t data )
-{
-    transmit( data );
-    return spdr;
 }
 
 LOT_status_typedef LOT_spi0::transmit( const uint8_t register_address, const uint8_t data )
@@ -166,4 +126,4 @@ void LOT_spi0::error( void )
     }
 }
 
-LOT_spi0 spi0;
+LOT_spi0 spi0( SPCR, SPSR, SPDR );

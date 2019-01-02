@@ -7,7 +7,7 @@
 #ifndef _LOT_SPI0_H_
 #define _LOT_SPI0_H_
 
-#include <inttypes.h>
+#include <avr/io.h>
 
 #if !defined( __AVR_ATmega328P__ )
 #    warning "Untested device"
@@ -55,9 +55,25 @@ typedef enum
     LOT_SPI_CLK_SAMPLING_2_EDGE
 } LOT_spi_clk_sampling_edge_typedef;
 
+/// SPCR
+const uint8_t LOT_SPIE { _BV( SPIE ) };
+const uint8_t LOT_SPE { _BV( SPE ) };
+const uint8_t LOT_DORD { _BV( DORD ) };
+const uint8_t LOT_MSTR { _BV( MSTR ) };
+const uint8_t LOT_CPOL { _BV( CPOL ) };
+const uint8_t LOT_CPHA { _BV( CPHA ) };
+const uint8_t LOT_SPR1 { _BV( SPR1 ) };
+const uint8_t LOT_SPR0 { _BV( SPR0 ) };
+
+/// SPSR
+const uint8_t LOT_SPIF { _BV( SPIF ) };
+const uint8_t LOT_WCOL { _BV( WCOL ) };
+const uint8_t LOT_SPI2X { _BV( SPI2X ) };
+
 class LOT_spi0 {
 public:
-    LOT_spi0();
+    LOT_spi0( volatile uint8_t &_spcr, volatile uint8_t &_spsr, volatile uint8_t &_spdr );
+    LOT_spi0( const uint8_t spi_number );
 
     void        setup( LOT_spi_data_order_typedef        data_order,
                        LOT_spi_clk_idle_state_typedef    clk_idle,
@@ -81,13 +97,38 @@ public:
 
 protected:
 private:
-    uint8_t error_count;
+    uint8_t           error_count;
+    volatile uint8_t &spcr;
+    volatile uint8_t &spsr;
+    volatile uint8_t &spdr;
 
     /**
      * @brief 통신 에러가 발생한 경우 처리하는 함수
      */
     void __attribute__( ( weak ) ) error( void );
 };
+
+inline LOT_status_typedef LOT_spi0::transmit( const uint8_t data )
+{
+    spdr = data;
+#if LOT_SPI0_TIME_OUT <= 0xFF
+    uint8_t count = LOT_SPI0_TIME_OUT;
+#else
+    uint16_t count = LOT_SPI0_TIME_OUT;
+#endif
+    while( ( spsr & LOT_SPIF ) == 0 )
+    {
+        --count;
+        if( count == 0 ) { return LOT_ERROR; }
+    }
+    return LOT_OK;
+}
+
+inline uint8_t LOT_spi0::transceive( const uint8_t data )
+{
+    transmit( data );
+    return SPDR;
+}
 
 extern LOT_spi0 spi0;
 #endif    // _LOT_SPI0_H_
