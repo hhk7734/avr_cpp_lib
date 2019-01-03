@@ -6,11 +6,8 @@
 
 #include "LOT_spi0.h"
 
-LOT_spi0::LOT_spi0( volatile uint8_t &_spcr, volatile uint8_t &_spsr, volatile uint8_t &_spdr )
+LOT_spi0::LOT_spi0()
     : error_count( 0 )
-    , spcr( _spcr )
-    , spsr( _spsr )
-    , spdr( _spdr )
 {
 }
 
@@ -28,27 +25,27 @@ void LOT_spi0::setup( LOT_spi_data_order_typedef        data_order,
     DDRB |= _BV( DDB5 );
 #endif
 
-    spcr = LOT_SPE | LOT_MSTR;
+    LOT_spcr0 = LOT_SPE | LOT_MSTR;
 
-    if( data_order == LOT_SPI_LSB_FIRST ) { spcr |= LOT_DORD; }
+    if( data_order == LOT_SPI_LSB_FIRST ) { LOT_spcr0 |= LOT_DORD; }
 
-    if( clk_idle == LOT_SPI_CLK_IDLE_HIGH ) { spcr |= LOT_CPOL; }
+    if( clk_idle == LOT_SPI_CLK_IDLE_HIGH ) { LOT_spcr0 |= LOT_CPOL; }
 
-    if( clk_sampling_edge == LOT_SPI_CLK_SAMPLING_2_EDGE ) { spcr |= LOT_CPHA; }
+    if( clk_sampling_edge == LOT_SPI_CLK_SAMPLING_2_EDGE ) { LOT_spcr0 |= LOT_CPHA; }
 
-    spsr &= ~LOT_SPI2X;
+    LOT_spsr0 &= ~LOT_SPI2X;
     switch( clk_divider )
     {
-        case LOT_SPI_SCK_DIV_2: spsr |= LOT_SPI2X;
+        case LOT_SPI_SCK_DIV_2: LOT_spsr0 |= LOT_SPI2X;
         case LOT_SPI_SCK_DIV_4: break;
 
-        case LOT_SPI_SCK_DIV_8: spsr |= LOT_SPI2X;
-        case LOT_SPI_SCK_DIV_16: spcr |= LOT_SPR0; break;
+        case LOT_SPI_SCK_DIV_8: LOT_spsr0 |= LOT_SPI2X;
+        case LOT_SPI_SCK_DIV_16: LOT_spcr0 |= LOT_SPR0; break;
 
-        case LOT_SPI_SCK_DIV_32: spsr |= LOT_SPI2X;
-        case LOT_SPI_SCK_DIV_64: spcr |= LOT_SPR1; break;
+        case LOT_SPI_SCK_DIV_32: LOT_spsr0 |= LOT_SPI2X;
+        case LOT_SPI_SCK_DIV_64: LOT_spcr0 |= LOT_SPR1; break;
 
-        case LOT_SPI_SCK_DIV_128: spcr |= LOT_SPR1 | LOT_SPR0; break;
+        case LOT_SPI_SCK_DIV_128: LOT_spcr0 |= LOT_SPR1 | LOT_SPR0; break;
     }
 }
 
@@ -75,12 +72,12 @@ LOT_status_typedef LOT_spi0::transmit( const uint8_t register_address, const uin
 
 LOT_status_typedef LOT_spi0::receive( const uint8_t register_address, uint8_t *data, uint8_t size )
 {
-    if( transmit( register_address ) == LOT_OK )
+    if( transmit( register_address | LOT_SPI0_READ_MASK ) == LOT_OK )
     {
         for( ; size > 0; --size )
         {
             transmit( 0 );
-            *data++ = spdr;
+            *data++ = LOT_spdr0;
         }
         return LOT_OK;
     }
@@ -93,9 +90,9 @@ LOT_status_typedef LOT_spi0::receive( const uint8_t register_address, uint8_t *d
 
 uint8_t LOT_spi0::receive( const uint8_t register_address )
 {
-    transmit( register_address );
+    transmit( register_address | LOT_SPI0_READ_MASK );
     transmit( 0 );
-    return spdr;
+    return LOT_spdr0;
 }
 
 LOT_status_typedef LOT_spi0::transceive( uint8_t *data, uint8_t size )
@@ -104,10 +101,10 @@ LOT_status_typedef LOT_spi0::transceive( uint8_t *data, uint8_t size )
     {
         for( ; size > 1; --size )
         {
-            *data++ = spdr;
+            *data++ = LOT_spdr0;
             transmit( *data );
         }
-        *data = spdr;
+        *data = LOT_spdr0;
         return LOT_OK;
     }
     else
@@ -126,4 +123,4 @@ void LOT_spi0::error( void )
     }
 }
 
-LOT_spi0 spi0( SPCR, SPSR, SPDR );
+LOT_spi0 spi0;
