@@ -25,27 +25,27 @@ void LOT_spi0::setup( LOT_spi_data_order_typedef        data_order,
     DDRB |= _BV( DDB5 );
 #endif
 
-    LOT_spcr0 = LOT_SPE | LOT_MSTR;
+    SPCR = _BV( SPE ) | _BV( MSTR );
 
-    if( data_order == LOT_SPI_LSB_FIRST ) { LOT_spcr0 |= LOT_DORD; }
+    if( data_order == LOT_SPI_LSB_FIRST ) { SPCR |= _BV( DORD ); }
 
-    if( clk_idle == LOT_SPI_CLK_IDLE_HIGH ) { LOT_spcr0 |= LOT_CPOL; }
+    if( clk_idle == LOT_SPI_CLK_IDLE_HIGH ) { SPCR |= _BV( CPOL ); }
 
-    if( clk_sampling_edge == LOT_SPI_CLK_SAMPLING_2_EDGE ) { LOT_spcr0 |= LOT_CPHA; }
+    if( clk_sampling_edge == LOT_SPI_CLK_SAMPLING_2_EDGE ) { SPCR |= _BV( CPHA ); }
 
-    LOT_spsr0 &= ~LOT_SPI2X;
+    SPSR &= ~_BV( SPI2X );
     switch( clk_divider )
     {
-        case LOT_SPI_SCK_DIV_2: LOT_spsr0 |= LOT_SPI2X;
+        case LOT_SPI_SCK_DIV_2: SPSR |= _BV( SPI2X );
         case LOT_SPI_SCK_DIV_4: break;
 
-        case LOT_SPI_SCK_DIV_8: LOT_spsr0 |= LOT_SPI2X;
-        case LOT_SPI_SCK_DIV_16: LOT_spcr0 |= LOT_SPR0; break;
+        case LOT_SPI_SCK_DIV_8: SPSR |= _BV( SPI2X );
+        case LOT_SPI_SCK_DIV_16: SPCR |= _BV( SPR0 ); break;
 
-        case LOT_SPI_SCK_DIV_32: LOT_spsr0 |= LOT_SPI2X;
-        case LOT_SPI_SCK_DIV_64: LOT_spcr0 |= LOT_SPR1; break;
+        case LOT_SPI_SCK_DIV_32: SPSR |= _BV( SPI2X );
+        case LOT_SPI_SCK_DIV_64: SPCR |= _BV( SPR1 ); break;
 
-        case LOT_SPI_SCK_DIV_128: LOT_spcr0 |= LOT_SPR1 | LOT_SPR0; break;
+        case LOT_SPI_SCK_DIV_128: SPCR |= _BV( SPR1 ) | _BV( SPR0 ); break;
     }
 }
 
@@ -77,7 +77,7 @@ LOT_status_typedef LOT_spi0::receive( const uint8_t register_address, uint8_t *d
         for( ; size > 0; --size )
         {
             transmit( 0 );
-            *data++ = LOT_spdr0;
+            *data++ = SPDR;
         }
         return LOT_OK;
     }
@@ -92,7 +92,7 @@ uint8_t LOT_spi0::receive( const uint8_t register_address )
 {
     transmit( register_address | LOT_SPI0_READ_MASK );
     transmit( 0 );
-    return LOT_spdr0;
+    return SPDR;
 }
 
 LOT_status_typedef LOT_spi0::transceive( uint8_t *data, uint8_t size )
@@ -101,10 +101,10 @@ LOT_status_typedef LOT_spi0::transceive( uint8_t *data, uint8_t size )
     {
         for( ; size > 1; --size )
         {
-            *data++ = LOT_spdr0;
+            *data++ = SPDR;
             transmit( *data );
         }
-        *data = LOT_spdr0;
+        *data = SPDR;
         return LOT_OK;
     }
     else
