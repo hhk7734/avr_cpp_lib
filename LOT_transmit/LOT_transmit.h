@@ -23,6 +23,10 @@ public:
      * @brief 숫자형 데이터를 문자열로 송신
      * @param type data 송신할 데이터
      */
+    inline void transmit( uint8_t *data, uint8_t size )
+    {
+        for( uint8_t i = 0; i < size; ++i ) { transmit_basic( data[i] ); }
+    }
     inline void transmit( uint8_t data ) { transmit_basic( data ); }
     inline void transmit( char data ) { transmit_basic( static_cast<uint8_t>( data ) ); }
     void        transmit( const char data[] );
