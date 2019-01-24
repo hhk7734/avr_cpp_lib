@@ -7,7 +7,7 @@
 #ifndef _LOT_RECEIVE_H_
 #define _LOT_RECEIVE_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 
 class LOT_receive {
 public:

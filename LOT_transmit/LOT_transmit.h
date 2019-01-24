@@ -7,7 +7,7 @@
 #ifndef _LOT_TRANSMIT_H_
 #define _LOT_TRANSMIT_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 
 class LOT_transmit {
 public:
@@ -20,13 +20,17 @@ public:
     virtual void transmit_basic( uint8_t data ) = 0;
 
     /**
+     * @brief 데이터 송신 가상 함수
+     * @param uint8_t *data 송신할 데이터
+     * @param uint16_t size 송신할 데이터 수
+     */
+    virtual void transmit_basic( uint8_t *data, uint16_t size ) = 0;
+
+    /**
      * @brief 숫자형 데이터를 문자열로 송신
      * @param type data 송신할 데이터
      */
-    inline void transmit( uint8_t *data, uint8_t size )
-    {
-        for( uint8_t i = 0; i < size; ++i ) { transmit_basic( data[i] ); }
-    }
+    inline void transmit( uint8_t *data, uint8_t size ) { transmit_basic( data, size ); }
     inline void transmit( uint8_t data ) { transmit_basic( data ); }
     inline void transmit( char data ) { transmit_basic( static_cast<uint8_t>( data ) ); }
     void        transmit( const char data[] );
