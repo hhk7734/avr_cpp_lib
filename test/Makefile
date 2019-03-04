@@ -1,12 +1,15 @@
 # C/C++ AVR Makefile
 TARGET = test
-MCU_TARGET = atmega328p
-MCU_F_CPU  = 16000000UL
+# MCU_TARGET = atmega328p
+# MCU_F_CPU  = 16000000UL
+
+MCU_TARGET = atmega128
+MCU_F_CPU  = 11059200UL
 
 PROGRAMMER = stk500
 
 # PORT = /dev/cu.usbserial-DN042E96
-PORT = /dev/ttyS6
+PORT = /dev/ttyS2
 
 # BAUDRATE = 57600
 BAUDRATE = 115200

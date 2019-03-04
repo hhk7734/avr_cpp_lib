@@ -4,11 +4,11 @@
 
 int main( void )
 {
-    DDRB |= _BV( DDB5 );
+    DDRA |= _BV( DDA5 );
 
     for ( ;; )
     {
-        PORTB ^= _BV( PB5 );
-        _delay_ms( 100 );
+        PORTA ^= _BV( PA5 );
+        _delay_us( 100 );
     }
 }
