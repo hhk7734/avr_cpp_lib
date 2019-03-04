@@ -3,10 +3,10 @@ TARGET = test
 MCU_TARGET = atmega328p
 MCU_F_CPU  = 16000000UL
 
-PROGRAMMER = arduino
+PROGRAMMER = stk500
 
 # PORT = /dev/cu.usbserial-DN042E96
-PORT = /dev/ttyUSB0
+PORT = /dev/ttyS6
 
 # BAUDRATE = 57600
 BAUDRATE = 115200
@@ -51,8 +51,8 @@ C_SRCS = \
 CXX_SRCS =\
 src/main.cpp \
 ../cxa_virtual/cxa_virtual.cpp \
-../LOT_transmit/LOT_transmit.cpp \
-../LOT_receive/LOT_receive.cpp \
+../../common_cpp/LOT_transmit/LOT_transmit.cpp \
+../../common_cpp/LOT_receive/LOT_receive.cpp \
 ../LOT_uart0/LOT_uart0.cpp \
 ../LOT_i2c0/LOT_i2c0.cpp \
 ../LOT_spi0/LOT_spi0.cpp \
@@ -61,8 +61,8 @@ src/main.cpp \
 # C_INCS = $(dir $(call rwildcard,,*.h))
 C_INCS = \
 ../LOT_switch \
-../LOT_transmit \
-../LOT_receive \
+../../common_cpp/LOT_transmit \
+../../common_cpp/LOT_receive \
 ../LOT_uart0 \
 ../LOT_i2c0 \
 ../LOT_spi0 \
