@@ -52,18 +52,21 @@ public:
     /**
      * @brief UART 통신 설정
      * @param uint32_t baud_rate
+     * @{
+     */
+
+    /**
      * @param uint8_t data_bits 5, 6, 7, 8 or 9 bits
      * @param uint8_t stop_bits 1 or 2 bits
      * @param uint8_t parity 0-none, 1-odd, 2-even
      */
-    void                                           setup( const uint32_t baud_rate,
-                                                          const uint8_t  data_bits,
-                                                          const uint8_t  stop_bits,
-                                                          const uint8_t  parity );
-    __always_inline void setup( const uint32_t baud_rate )
-    {
-        setup( baud_rate, 8, 1, 0 );
-    }
+    void setup( const uint32_t baud_rate,
+                const uint8_t  data_bits,
+                const uint8_t  stop_bits,
+                const uint8_t  parity );
+
+    __always_inline void setup( const uint32_t baud_rate ) { setup( baud_rate, 8, 1, 0 ); }
+    /// @}
 
     /**
      * @brief 데이터 송신
