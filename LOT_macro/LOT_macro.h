@@ -7,8 +7,6 @@
 #ifndef _LOT_MACRO_H_
 #define _LOT_MACRO_H_
 
-#include <avr/io.h>
-
 /// 상태 반환 타입
 typedef enum
 {
@@ -27,6 +25,10 @@ typedef enum
     true
 } bool;
 #    endif
+#endif
+
+#ifndef _BV
+#    define _BV( bit ) ( 1 << ( bit ) )
 #endif
 
 /**
