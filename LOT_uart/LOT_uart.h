@@ -11,6 +11,7 @@
 #include <LOT_macro.h>
 #include <LOT_uart_const.h>
 #include <avr/interrupt.h>
+#include <LOT_ostream.h>
 
 #if !defined( __AVR_ATmega328P__ )
 #    warning "Untested device"
@@ -36,7 +37,7 @@
 #define LOT_UART_RX_BUF_SIZE 32
 /// @}
 
-class LOT_uart {
+class LOT_uart : public LOT_ostream {
 public:
     /**
      * @brief UART 레지스터 초기화
@@ -59,7 +60,7 @@ public:
                                                           const uint8_t  data_bits,
                                                           const uint8_t  stop_bits,
                                                           const uint8_t  parity );
-    inline __attribute__( ( always_inline ) ) void setup( const uint32_t baud_rate )
+    __always_inline void setup( const uint32_t baud_rate )
     {
         setup( baud_rate, 8, 1, 0 );
     }
@@ -70,6 +71,7 @@ public:
      * @return uint8_t 송신한 데이터 수
      */
     virtual uint8_t put( uint8_t data );
+    using LOT_ostream::put;
 
     /**
      * @brief 데이터 수신
@@ -96,12 +98,12 @@ public:
     /**
      * @brief USART_RX 인터럽트 서비스 루틴에서 호출할 함수
      */
-    inline __attribute__( ( always_inline ) ) void rx_isr( void );
+    __always_inline void rx_isr( void );
 
     /**
      * @brief USART_UDRE 인터럽트 서비스 루틴에서 호출할 함수
      */
-    inline __attribute__( ( always_inline ) ) void udre_isr( void );
+    __always_inline void udre_isr( void );
 
 protected:
     volatile uint8_t &ucsra;
