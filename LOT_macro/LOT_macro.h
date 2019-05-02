@@ -20,6 +20,7 @@ typedef enum
 
 #ifndef __cplusplus
 #    if !defined( __bool_true_false_are_defined )
+#        define __bool_true_false_are_defined
 typedef enum
 {
     false = 0x00,
