@@ -7,6 +7,9 @@
 #ifndef _LOT_MACRO_H_
 #define _LOT_MACRO_H_
 
+#undef __always_inline
+#define __always_inline inline __attribute__( ( always_inline ) )
+
 /// 상태 반환 타입
 typedef enum
 {
