@@ -13,21 +13,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#if !defined( __AVR_ATmega328P__ )
-#    warning "Untested device"
-#endif
-
-/**
- * @name UART 선택
- * 사용하는 경우 1, 아니면 0
- * @{
- */
-#define USE_LOT_UART_0 1
-#define USE_LOT_UART_1 0
-#define USE_LOT_UART_2 0
-#define USE_LOT_UART_3 0
-/// @}
-
 /**
  * @name ring buffer
  * 버퍼 크기는 32, 64, 128 ... 2의 지수로 설정
@@ -136,13 +121,21 @@ class LOT_uart : public LOT_iostream {
 
 #include <LOT_uart_inline.h>
 
-#if USE_LOT_UART_0
+#if defined( _USE_LOT_UART_0_ )
 extern LOT_uart uart0;
 #    define uart uart0
 #endif
 
-#if USE_LOT_UART_1
-exter LOT_uart uart1;
+#if defined( _USE_LOT_UART_1_ )
+extern LOT_uart uart1;
+#endif
+
+#if defined( _USE_LOT_UART_2_ )
+extern LOT_uart uart2;
+#endif
+
+#if defined( _USE_LOT_UART_3_ )
+extern LOT_uart uart3;
 #endif
 
 #endif // _LOT_UART_H_
