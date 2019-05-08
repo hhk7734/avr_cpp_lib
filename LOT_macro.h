@@ -25,7 +25,7 @@ typedef enum
     true
 } bool;
 #    endif
-#endif
+#endif // __cplusplus
 
 #ifndef _BV
 #    define _BV( bit ) ( 1 << ( bit ) )
