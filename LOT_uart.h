@@ -23,12 +23,16 @@
 /// @}
 
 class LOT_uart : public LOT_iostream {
-    public:
+public:
     /**
      * @brief UART 레지스터 초기화
      */
-    LOT_uart( volatile uint8_t &_ucsra, volatile uint8_t &_ucsrb, volatile uint8_t &_ucsrc, volatile uint8_t &_ubrrl,
-              volatile uint8_t &_ubrrh, volatile uint8_t &_udr );
+    LOT_uart( volatile uint8_t &_ucsra,
+              volatile uint8_t &_ucsrb,
+              volatile uint8_t &_ucsrc,
+              volatile uint8_t &_ubrrl,
+              volatile uint8_t &_ubrrh,
+              volatile uint8_t &_udr );
 
     /**
      * @brief UART 통신 설정
@@ -41,12 +45,11 @@ class LOT_uart : public LOT_iostream {
      * @param uint8_t stop_bits 1 or 2 bits
      * @param uint8_t parity 0-none, 1-odd, 2-even
      */
-    void setup( const uint32_t baud_rate, const uint8_t data_bits, const uint8_t stop_bits, const uint8_t parity );
-
-    inline __attribute__( ( always_inline ) ) void setup( const uint32_t baud_rate )
-    {
-        setup( baud_rate, 8, 1, 0 );
-    }
+    void setup( const uint32_t baud_rate,
+                const uint8_t  data_bits,
+                const uint8_t  stop_bits,
+                const uint8_t  parity );
+    void setup( const uint32_t baud_rate );
     /// @}
 
     /**
@@ -55,10 +58,7 @@ class LOT_uart : public LOT_iostream {
      * @return uint8_t 송신한 데이터 수
      */
     uint8_t         put( uint8_t data );
-    virtual uint8_t put( char c )
-    {
-        return put( static_cast<uint8_t>( c ) );
-    }
+    virtual uint8_t put( char c );
     using LOT_ostream::put;
 
     /**
@@ -68,22 +68,15 @@ class LOT_uart : public LOT_iostream {
 
     /// @param char 수신 데이터
     uint8_t           get( void );
-    virtual LOT_uart &get( char *p )
-    {
-        *p = get();
-        return *this;
-    }
+    virtual LOT_uart &get( char *p );
 
     /**
-     * @param uint8_t *data 수신 데이터
+     * @param uint8_t *p 수신 데이터
      * @param uint8_t n 수신 데이터 수
      * @return LOT_uart&
      */
-    LOT_uart &        get( uint8_t *data, uint8_t n );
-    virtual LOT_uart &get( char *p, uint8_t n )
-    {
-        return get( ( uint8_t * )p, n );
-    }
+    LOT_uart &        get( uint8_t *p, uint8_t n );
+    virtual LOT_uart &get( char *p, uint8_t n );
     /// @}
 
     /**
@@ -95,14 +88,14 @@ class LOT_uart : public LOT_iostream {
     /**
      * @brief USART_RX 인터럽트 서비스 루틴에서 호출할 함수
      */
-    inline __attribute__( ( always_inline ) ) void rx_isr( void );
+    void rx_isr( void );
 
     /**
      * @brief USART_UDRE 인터럽트 서비스 루틴에서 호출할 함수
      */
-    inline __attribute__( ( always_inline ) ) void udre_isr( void );
+    void udre_isr( void );
 
-    protected:
+protected:
     volatile uint8_t &ucsra;
     volatile uint8_t &ucsrb;
     volatile uint8_t &ucsrc;
@@ -138,4 +131,4 @@ extern LOT_uart uart2;
 extern LOT_uart uart3;
 #endif
 
-#endif // _LOT_UART_H_
+#endif    // _LOT_UART_H_

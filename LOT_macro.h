@@ -7,6 +7,8 @@
 #ifndef _LOT_MACRO_H_
 #define _LOT_MACRO_H_
 
+#ifndef _LOT_STATUS_TYPEDEF_
+#    define _LOT_STATUS_TYPEDEF_
 /// 상태 반환 타입
 typedef enum
 {
@@ -15,6 +17,7 @@ typedef enum
     LOT_BUSY,
     LOT_TIMEOUT
 } LOT_status_typedef;
+#endif    // _LOT_STATUS_TYPEDEF_
 
 #ifndef __cplusplus
 #    if !defined( __bool_true_false_are_defined )
@@ -25,7 +28,7 @@ typedef enum
     true
 } bool;
 #    endif
-#endif // __cplusplus
+#endif    // __cplusplus
 
 #ifndef _BV
 #    define _BV( bit ) ( 1 << ( bit ) )
@@ -61,4 +64,4 @@ typedef enum
  */
 #define _is_bit_clear( reg, num_bit ) ( !_is_bit_set( reg, num_bit ) )
 
-#endif // _LOT_MACRO_H_
+#endif    // _LOT_MACRO_H_
