@@ -19,13 +19,91 @@ LOT_i2c::LOT_i2c( volatile uint8_t &_twbr,
 {
 }
 
+void LOT_i2c::setup( const uint32_t scl_clock )
+{
+    twsr = 0;
+    twbr = ( ( F_CPU / scl_clock ) - 16 ) / 2;
+}
+
+LOT_status_typedef
+    LOT_i2c::transmit( const uint8_t slave_address, const uint8_t *data, uint8_t size )
+{
+    if( SLA_W( slave_address ) == LOT_OK )
+    {
+        for( uint8_t i = 0; i < size; ++i ) { transmit_data( data[i] ); }
+        stop();
+        return LOT_OK;
+    }
+    else
+    {
+        error();
+        return LOT_ERROR;
+    }
+}
+
+LOT_status_typedef LOT_i2c::transmit( const uint8_t  slave_address,
+                                      const uint8_t  register_address,
+                                      const uint8_t *data,
+                                      uint8_t        size )
+{
+    if( SLA_W( slave_address ) == LOT_OK )
+    {
+        transmit_data( register_address );
+        for( uint8_t i = 0; i < size; ++i ) { transmit_data( data[i] ); }
+        stop();
+        return LOT_OK;
+    }
+    else
+    {
+        error();
+        return LOT_ERROR;
+    }
+}
+
+LOT_status_typedef LOT_i2c::receive( const uint8_t slave_address, uint8_t *data, uint8_t size )
+{
+    if( SLA_R( slave_address ) == LOT_OK )
+    {
+        for( uint8_t i = 0; i < size - 1; ++i ) { data[i] = receive_data(); }
+        data[size - 1] = receive_last_data();
+        stop();
+        return LOT_OK;
+    }
+    else
+    {
+        error();
+        return LOT_ERROR;
+    }
+}
+
+LOT_status_typedef LOT_i2c::receive( const uint8_t slave_address,
+                                     const uint8_t register_address,
+                                     uint8_t *     data,
+                                     uint8_t       size )
+{
+    if( SLA_W( slave_address ) == LOT_OK )
+    {
+        transmit_data( register_address );
+        SLA_R( slave_address );
+        for( uint8_t i = 0; i < size - 1; ++i ) { data[i] = receive_data(); }
+        data[size - 1] = receive_last_data();
+        stop();
+        return LOT_OK;
+    }
+    else
+    {
+        error();
+        return LOT_ERROR;
+    }
+}
+
 LOT_status_typedef __attribute__( ( noinline ) ) LOT_i2c::control( const uint8_t _twcr )
 {
     twcr = _twcr;
-#if LOT_I2C0_TIME_OUT <= 0xFF
-    uint8_t count = LOT_I2C0_TIME_OUT;
+#if LOT_i2c_TIME_OUT <= 0xFF
+    uint8_t count = LOT_i2c_TIME_OUT;
 #else
-    uint16_t count = LOT_I2C0_TIME_OUT;
+    uint16_t count = LOT_i2c_TIME_OUT;
 #endif
     while( _is_bit_clear( twcr & LOT_TWINT ) )
     {
