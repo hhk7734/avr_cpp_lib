@@ -4,7 +4,6 @@
  * @brief AVR UART 통신
  */
 
-#include <LOT_macro.h>
 #include <LOT_uart.h>
 
 LOT_uart::LOT_uart( volatile uint8_t &_ucsra, volatile uint8_t &_ucsrb, volatile uint8_t &_ucsrc,

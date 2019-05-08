@@ -8,6 +8,7 @@
 #define _LOT_UART_H_
 
 #include <LOT_iostream.h>
+#include <LOT_macro.h>
 #include <LOT_uart_const.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -57,7 +58,7 @@ class LOT_uart : public LOT_iostream {
      */
     void setup( const uint32_t baud_rate, const uint8_t data_bits, const uint8_t stop_bits, const uint8_t parity );
 
-    __always_inline void setup( const uint32_t baud_rate )
+    inline __attribute__( ( always_inline ) ) void setup( const uint32_t baud_rate )
     {
         setup( baud_rate, 8, 1, 0 );
     }
@@ -89,7 +90,11 @@ class LOT_uart : public LOT_iostream {
      * @param uint8_t n 수신 데이터 수
      * @return LOT_uart&
      */
-    virtual LOT_uart &get( uint8_t *data, uint8_t n );
+    LOT_uart &        get( uint8_t *data, uint8_t n );
+    virtual LOT_uart &get( char *p, uint8_t n )
+    {
+        return get( ( uint8_t * )p, n );
+    }
     /// @}
 
     /**
@@ -101,12 +106,12 @@ class LOT_uart : public LOT_iostream {
     /**
      * @brief USART_RX 인터럽트 서비스 루틴에서 호출할 함수
      */
-    __always_inline void rx_isr( void );
+    inline __attribute__( ( always_inline ) ) void rx_isr( void );
 
     /**
      * @brief USART_UDRE 인터럽트 서비스 루틴에서 호출할 함수
      */
-    __always_inline void udre_isr( void );
+    inline __attribute__( ( always_inline ) ) void udre_isr( void );
 
     protected:
     volatile uint8_t &ucsra;

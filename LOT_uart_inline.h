@@ -17,9 +17,9 @@ void LOT_uart::udre_isr( void )
 {
     udr         = tx_buf[tx_buf_tail];
     tx_buf_tail = ( tx_buf_tail + 1 ) % LOT_UART_TX_BUF_SIZE;
-    ucsra |= LOT_TXC;
+    _set_bit( ucsra, LOT_TXC );
     if ( tx_buf_head == tx_buf_tail )
     {
-        ucsrb &= ~LOT_UDRIE;
+        _clear_bit( ucsrb, LOT_UDRIE );
     }
 }
