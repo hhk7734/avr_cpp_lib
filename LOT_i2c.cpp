@@ -100,12 +100,12 @@ LOT_status_typedef LOT_i2c::receive( const uint8_t slave_address,
 LOT_status_typedef __attribute__( ( noinline ) ) LOT_i2c::control( const uint8_t _twcr )
 {
     twcr = _twcr;
-#if LOT_i2c_TIME_OUT <= 0xFF
-    uint8_t count = LOT_i2c_TIME_OUT;
+#if LOT_I2C_TIME_OUT <= 0xFF
+    uint8_t count = LOT_I2C_TIME_OUT;
 #else
-    uint16_t count = LOT_i2c_TIME_OUT;
+    uint16_t count = LOT_I2C_TIME_OUT;
 #endif
-    while( _is_bit_clear( twcr & LOT_TWINT ) )
+    while( _is_bit_clear( twcr, LOT_TWINT ) )
     {
         --count;
         if( count == 0 )
@@ -123,7 +123,7 @@ void LOT_i2c::error( void )
     switch( error_state )
     {
         case 0xFF: break;
-        case TW_MT_ARB_LOST: control( LOT_TWINT | LOT_TWEA | LOT_TWEN ); break;
+        case TW_MT_ARB_LOST: control( _BV( LOT_TWINT ) | _BV( LOT_TWEA ) | _BV( LOT_TWEN ) ); break;
         case TW_MT_SLA_NACK:
         case TW_MT_DATA_NACK:
         case TW_MR_SLA_NACK:
@@ -137,3 +137,13 @@ void LOT_i2c::error( void )
         for( ;; ) {}
     }
 }
+
+#if defined( _USE_LOT_I2C_0_ )
+
+#    if !defined( __AVR_ATmega328P__ )
+#        warning "Untested device"
+#    endif
+
+LOT_i2c i2c0( TWBR, TWSR, TWDR, TWCR );
+
+#endif    /// _USE_LOT_I2C_0_
