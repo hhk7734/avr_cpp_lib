@@ -5,6 +5,15 @@
 
 #include <avr/io.h>
 
+/**
+ * @name Ring_buffer
+ * 버퍼 크기는 32, 64, 128 ... 2의 지수로 설정
+ * @{
+ */
+#define LOT_UART_TX_BUF_SIZE 32
+#define LOT_UART_RX_BUF_SIZE 32
+/// @}
+
 /// UCSRA
 const uint8_t LOT_RXC  = RXC0;
 const uint8_t LOT_TXC  = TXC0;
