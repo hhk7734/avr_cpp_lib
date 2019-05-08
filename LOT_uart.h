@@ -14,7 +14,7 @@
 #include <avr/io.h>
 
 /**
- * @name ring buffer
+ * @name Ring_buffer
  * 버퍼 크기는 32, 64, 128 ... 2의 지수로 설정
  * @{
  */
@@ -35,13 +35,13 @@ public:
               volatile uint8_t &_udr );
 
     /**
-     * @brief UART 통신 설정
-     * @param uint32_t baud_rate
+     * @name UART 통신 설정
      * @{
      */
 
     /**
      * @param uint8_t data_bits 5, 6, 7, 8 or 9 bits
+     * @param uint32_t baud_rate
      * @param uint8_t stop_bits 1 or 2 bits
      * @param uint8_t parity 0-none, 1-odd, 2-even
      */
@@ -49,38 +49,62 @@ public:
                 const uint8_t  data_bits,
                 const uint8_t  stop_bits,
                 const uint8_t  parity );
+
+    /// @param uint8_t data_bits 5, 6, 7, 8 or 9 bits
     void setup( const uint32_t baud_rate );
     /// @}
 
     /**
-     * @brief 데이터 송신
-     * @param uint8_t data
-     * @return uint8_t 송신한 데이터 수
-     */
-    uint8_t         put( uint8_t data );
-    virtual uint8_t put( char c );
-    using LOT_ostream::put;
-
-    /**
-     * @brief 데이터 수신
+     * @name 데이터 송신
      * @{
      */
 
-    /// @param char 수신 데이터
-    uint8_t           get( void );
+    /**
+     * @param uint8_t data
+     * @return uint8_t 송신한 데이터 수
+     */
+    uint8_t put( uint8_t data );
+
+    /**
+     * @param uint8_t char c
+     * @return uint8_t 송신한 데이터 수
+     */
+    virtual uint8_t put( char c );
+
+    using LOT_ostream::put;
+    /// @}
+
+    /**
+     * @name 데이터 수신
+     * @{
+     */
+
+    /// @return uint8_t 수신 데이터
+    uint8_t get( void );
+
+    /**
+     * @param char *p 수신 데이터
+     * @return LOT_uart &
+     */
     virtual LOT_uart &get( char *p );
 
     /**
      * @param uint8_t *p 수신 데이터
-     * @param uint8_t n 수신 데이터 수
-     * @return LOT_uart&
+     * @param uint8_t n 최대 수신 데이터 수
+     * @return LOT_uart &
      */
-    LOT_uart &        get( uint8_t *p, uint8_t n );
+    LOT_uart &get( uint8_t *p, uint8_t n );
+
+    /**
+     * @param char *p 수신 데이터
+     * @param uint8_t n 최대 수신 데이터 수
+     * @return LOT_uart &
+     */
     virtual LOT_uart &get( char *p, uint8_t n );
     /// @}
 
     /**
-     * @brief 읽지 않은 데이터 수
+     * @brief 버퍼에서 읽지 않은 데이터 수
      * @return uint8_t 읽지 않은 데이터 수
      */
     virtual uint8_t gcount( void );
@@ -108,6 +132,7 @@ protected:
     volatile uint8_t rx_buf_head;
     volatile uint8_t rx_buf_tail;
 
+    /// @todo 마지막 변수의 호출 속도가 빠른지 확인
     volatile uint8_t tx_buf[LOT_UART_TX_BUF_SIZE];
     volatile uint8_t rx_buf[LOT_UART_RX_BUF_SIZE];
 };
