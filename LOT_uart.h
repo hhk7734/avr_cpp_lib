@@ -11,7 +11,7 @@
 #include <LOT_macro.h>
 #include <LOT_uart_const.h>
 #include <avr/interrupt.h>
-#include <LOT_ostream.h>
+#include <LOT_iostream.h>
 
 #if !defined( __AVR_ATmega328P__ )
 #    warning "Untested device"
@@ -37,7 +37,7 @@
 #define LOT_UART_RX_BUF_SIZE 32
 /// @}
 
-class LOT_uart : public LOT_ostream {
+class LOT_uart : public LOT_iostream {
 public:
     /**
      * @brief UART 레지스터 초기화
@@ -81,8 +81,13 @@ public:
      * @{
      */
 
-    /// @return uint8_t 수신 데이터
-    virtual uint8_t get( void );
+    /// @param char 수신 데이터
+    uint8_t           get( void );
+    virtual LOT_uart &get( char *p )
+    {
+        *p = get();
+        return *this;
+    }
 
     /**
      * @param uint8_t *data 수신 데이터
