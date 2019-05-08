@@ -69,7 +69,11 @@ class LOT_uart : public LOT_iostream {
      * @param uint8_t data
      * @return uint8_t 송신한 데이터 수
      */
-    virtual uint8_t put( uint8_t data );
+    uint8_t         put( uint8_t data );
+    virtual uint8_t put( char c )
+    {
+        return put( static_cast<uint8_t>( c ) );
+    }
     using LOT_ostream::put;
 
     /**
