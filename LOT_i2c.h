@@ -30,7 +30,7 @@ public:
     /// @param uint32_t scl_clock scl 주파수
     void setup( const uint32_t scl_clock );
 
-    void setup( void ) { setup( LOT_I2C0_DEFAULT_CLOCK ); }
+    void setup( void );
     /// @}
 
     /**
@@ -106,6 +106,8 @@ public:
      */
     uint8_t receive( const uint8_t slave_address, const uint8_t register_address );
     /// @}
+
+    /// @todo 통신 사이에 간격이 필요한 경우 코드 작성 필요
 
 protected:
     /**
