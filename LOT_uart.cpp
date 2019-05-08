@@ -4,6 +4,7 @@
  * @brief AVR UART 통신
  */
 
+#include <LOT_macro.h>
 #include <LOT_uart.h>
 
 LOT_uart::LOT_uart( volatile uint8_t &_ucsra, volatile uint8_t &_ucsrb, volatile uint8_t &_ucsrc,
@@ -15,12 +16,12 @@ LOT_uart::LOT_uart( volatile uint8_t &_ucsra, volatile uint8_t &_ucsrb, volatile
 void LOT_uart::setup( const uint32_t baud_rate, const uint8_t data_bits, const uint8_t stop_bits, const uint8_t parity )
 {
     /// @todo u2x 문제 생기면 해결
-    ucsra = LOT_U2X;
+    ucsra = _BV( LOT_U2X );
     /// ( F_CPU / baud_rate / 8 ) - 1 을 계산한 뒤 소수점 첫째 자리에서 반올림 해야하지만
     /// 부동소수 -> 정수로 갈때 버림을 하기 때문에 0.5를 더한다
     uint16_t temp = ( ( F_CPU / baud_rate / 4 ) - 1 ) / 2;
 
-    ucsrb = LOT_RXCIE | LOT_RXEN | LOT_TXEN;
+    ucsrb = _BV( LOT_RXCIE ) | _BV( LOT_RXEN ) | _BV( LOT_TXEN );
 
     /// @todo 9bit 지원
     if ( data_bits < 9 )
@@ -36,16 +37,16 @@ void LOT_uart::setup( const uint32_t baud_rate, const uint8_t data_bits, const u
     {
         /// odd parity
         case 1:
-            ucsrc |= LOT_UPM0;
+            _set_bit( ucsrc, LOT_UPM0 );
         /// even parity
         case 2:
-            ucsrc |= LOT_UPM1;
+            _set_bit( ucsrc, LOT_UPM1 );
             break;
     }
 
     if ( stop_bits == 2 )
     {
-        ucsrc |= LOT_USBS;
+        _set_bit( ucsrc, LOT_USBS );
     }
 
     ubrrh = temp >> 8;
@@ -56,10 +57,11 @@ void LOT_uart::setup( const uint32_t baud_rate, const uint8_t data_bits, const u
 
 uint8_t LOT_uart::put( uint8_t data )
 {
-    if ( ( tx_buf_head == tx_buf_tail ) && ( ucsra & LOT_UDRE ) )
+    if ( ( tx_buf_head == tx_buf_tail ) && _is_bit_set( ucsra, LOT_UDRE ) )
     {
         udr = data;
-        ucsra |= LOT_TXC;
+        _set_bit( ucsra, LOT_TXC );
+
         return 1;
     }
 
@@ -68,7 +70,7 @@ uint8_t LOT_uart::put( uint8_t data )
     while ( tx_buf_head == tx_buf_tail )
     {
     }
-    ucsrb |= LOT_UDRIE;
+    _set_bit( ucsrb, LOT_UDRIE );
     return 1;
 }
 
