@@ -15,4 +15,7 @@ void __cxa_pure_virtual( void )
     abort();
 }
 
-void __cxa_deleted_virtual( void ) { abort(); }
+void __cxa_deleted_virtual( void )
+{
+    abort();
+}

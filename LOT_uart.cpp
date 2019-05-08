@@ -6,25 +6,13 @@
 
 #include <LOT_uart.h>
 
-LOT_uart::LOT_uart( volatile uint8_t &_ucsra,
-                    volatile uint8_t &_ucsrb,
-                    volatile uint8_t &_ucsrc,
-                    volatile uint8_t &_ubrrl,
-                    volatile uint8_t &_ubrrh,
-                    volatile uint8_t &_udr )
-    : ucsra( _ucsra )
-    , ucsrb( _ucsrb )
-    , ucsrc( _ucsrc )
-    , ubrrl( _ubrrl )
-    , ubrrh( _ubrrh )
-    , udr( _udr )
+LOT_uart::LOT_uart( volatile uint8_t &_ucsra, volatile uint8_t &_ucsrb, volatile uint8_t &_ucsrc,
+                    volatile uint8_t &_ubrrl, volatile uint8_t &_ubrrh, volatile uint8_t &_udr )
+    : ucsra( _ucsra ), ucsrb( _ucsrb ), ucsrc( _ucsrc ), ubrrl( _ubrrl ), ubrrh( _ubrrh ), udr( _udr )
 {
 }
 
-void LOT_uart::setup( const uint32_t baud_rate,
-                      const uint8_t  data_bits,
-                      const uint8_t  stop_bits,
-                      const uint8_t  parity )
+void LOT_uart::setup( const uint32_t baud_rate, const uint8_t data_bits, const uint8_t stop_bits, const uint8_t parity )
 {
     /// @todo u2x 문제 생기면 해결
     ucsra = LOT_U2X;
@@ -35,21 +23,30 @@ void LOT_uart::setup( const uint32_t baud_rate,
     ucsrb = LOT_RXCIE | LOT_RXEN | LOT_TXEN;
 
     /// @todo 9bit 지원
-    if( data_bits < 9 ) { ucsrc = ( data_bits - 5 ) << 1; }
+    if ( data_bits < 9 )
+    {
+        ucsrc = ( data_bits - 5 ) << 1;
+    }
     else
     {
         ucsrc = ( 8 - 5 ) << 1;
     }
 
-    switch( parity )
+    switch ( parity )
     {
         /// odd parity
-        case 1: ucsrc |= LOT_UPM0;
+        case 1:
+            ucsrc |= LOT_UPM0;
         /// even parity
-        case 2: ucsrc |= LOT_UPM1; break;
+        case 2:
+            ucsrc |= LOT_UPM1;
+            break;
     }
 
-    if( stop_bits == 2 ) { ucsrc |= LOT_USBS; }
+    if ( stop_bits == 2 )
+    {
+        ucsrc |= LOT_USBS;
+    }
 
     ubrrh = temp >> 8;
     ubrrl = temp;
@@ -59,7 +56,7 @@ void LOT_uart::setup( const uint32_t baud_rate,
 
 uint8_t LOT_uart::put( uint8_t data )
 {
-    if( ( tx_buf_head == tx_buf_tail ) && ( ucsra & LOT_UDRE ) )
+    if ( ( tx_buf_head == tx_buf_tail ) && ( ucsra & LOT_UDRE ) )
     {
         udr = data;
         ucsra |= LOT_TXC;
@@ -68,7 +65,9 @@ uint8_t LOT_uart::put( uint8_t data )
 
     tx_buf[tx_buf_head] = data;
     tx_buf_head         = ( tx_buf_head + 1 ) % LOT_UART_TX_BUF_SIZE;
-    while( tx_buf_head == tx_buf_tail ) {}
+    while ( tx_buf_head == tx_buf_tail )
+    {
+    }
     ucsrb |= LOT_UDRIE;
     return 1;
 }
@@ -83,8 +82,11 @@ uint8_t LOT_uart::get( void )
 LOT_uart &LOT_uart::get( uint8_t *data, uint8_t n )
 {
     uint8_t temp = ( LOT_UART_RX_BUF_SIZE + rx_buf_head - rx_buf_tail ) % LOT_UART_RX_BUF_SIZE;
-    if( temp < n ) { n = temp; }
-    for( uint8_t i = 0; i < n; ++i )
+    if ( temp < n )
+    {
+        n = temp;
+    }
+    for ( uint8_t i = 0; i < n; ++i )
     {
         data[i]     = rx_buf[rx_buf_tail];
         rx_buf_tail = ( rx_buf_tail + 1 ) % LOT_UART_RX_BUF_SIZE;

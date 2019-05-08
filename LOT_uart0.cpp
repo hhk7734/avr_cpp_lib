@@ -28,4 +28,4 @@ ISR( USART0_UDRE_vect )
     uart0.udre_isr();
 }
 
-#endif    /// USE_LOT_UART_0
+#endif /// USE_LOT_UART_0

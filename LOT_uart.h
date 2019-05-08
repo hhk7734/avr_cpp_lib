@@ -7,11 +7,11 @@
 #ifndef _LOT_UART_H_
 #define _LOT_UART_H_
 
-#include <avr/io.h>
+#include <LOT_iostream.h>
 #include <LOT_macro.h>
 #include <LOT_uart_const.h>
 #include <avr/interrupt.h>
-#include <LOT_iostream.h>
+#include <avr/io.h>
 
 #if !defined( __AVR_ATmega328P__ )
 #    warning "Untested device"
@@ -38,16 +38,12 @@
 /// @}
 
 class LOT_uart : public LOT_iostream {
-public:
+    public:
     /**
      * @brief UART 레지스터 초기화
      */
-    LOT_uart( volatile uint8_t &_ucsra,
-              volatile uint8_t &_ucsrb,
-              volatile uint8_t &_ucsrc,
-              volatile uint8_t &_ubrrl,
-              volatile uint8_t &_ubrrh,
-              volatile uint8_t &_udr );
+    LOT_uart( volatile uint8_t &_ucsra, volatile uint8_t &_ucsrb, volatile uint8_t &_ucsrc, volatile uint8_t &_ubrrl,
+              volatile uint8_t &_ubrrh, volatile uint8_t &_udr );
 
     /**
      * @brief UART 통신 설정
@@ -60,12 +56,12 @@ public:
      * @param uint8_t stop_bits 1 or 2 bits
      * @param uint8_t parity 0-none, 1-odd, 2-even
      */
-    void setup( const uint32_t baud_rate,
-                const uint8_t  data_bits,
-                const uint8_t  stop_bits,
-                const uint8_t  parity );
+    void setup( const uint32_t baud_rate, const uint8_t data_bits, const uint8_t stop_bits, const uint8_t parity );
 
-    __always_inline void setup( const uint32_t baud_rate ) { setup( baud_rate, 8, 1, 0 ); }
+    __always_inline void setup( const uint32_t baud_rate )
+    {
+        setup( baud_rate, 8, 1, 0 );
+    }
     /// @}
 
     /**
@@ -113,7 +109,7 @@ public:
      */
     __always_inline void udre_isr( void );
 
-protected:
+    protected:
     volatile uint8_t &ucsra;
     volatile uint8_t &ucsrb;
     volatile uint8_t &ucsrc;
@@ -141,4 +137,4 @@ extern LOT_uart uart0;
 exter LOT_uart uart1;
 #endif
 
-#endif    // _LOT_UART_H_
+#endif // _LOT_UART_H_

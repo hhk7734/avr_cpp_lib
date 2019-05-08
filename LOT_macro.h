@@ -64,4 +64,4 @@ typedef enum
  */
 #define _is_bit_clear( reg, num_bit ) ( !_is_bit_set( reg, num_bit ) )
 
-#endif    // _LOT_MACRO_H_
+#endif // _LOT_MACRO_H_
