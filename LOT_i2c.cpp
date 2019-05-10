@@ -4,7 +4,7 @@
  * @brief AVR I2C 마스터 통신
  */
 
-#include "LOT_i2c.h"
+#include <LOT_i2c.h>
 
 LOT_i2c::LOT_i2c( volatile uint8_t &_twbr,
                   volatile uint8_t &_twsr,
