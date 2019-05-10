@@ -7,11 +7,10 @@
 #ifndef _LOT_UART_H_
 #define _LOT_UART_H_
 
+#include <LOT_core.h>
 #include <LOT_iostream.h>
-#include <LOT_macro.h>
 #include <LOT_uart_const.h>
 #include <avr/interrupt.h>
-#include <avr/io.h>
 
 class LOT_uart : public LOT_iostream {
 public:

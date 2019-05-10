@@ -7,7 +7,7 @@
 #ifndef _LOT_I2C_H_
 #define _LOT_I2C_H_
 
-#include <LOT_macro.h>
+#include <LOT_core.h>
 #include <stdint.h>
 #include <LOT_i2c_const.h>
 #include <util/twi.h>
